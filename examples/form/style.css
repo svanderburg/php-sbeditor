@@ -1,0 +1,24 @@
+body
+{
+	color: #000000;
+}
+
+.mandatory
+{
+	color: #ff0000;
+}
+
+form div
+{
+	display: table-row;
+}
+
+form label
+{
+	display: table-cell;
+}
+
+form input
+{
+	display: table-cell;
+}
