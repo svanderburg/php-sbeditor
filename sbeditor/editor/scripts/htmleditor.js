@@ -1,6 +1,9 @@
 /**
- * TODO
+ * @static @class sbeditor
+ *
+ * Exposes functions to manage the state of embedded HTML editors
  */
+
 (function() {
     var sbeditor = {};
 
