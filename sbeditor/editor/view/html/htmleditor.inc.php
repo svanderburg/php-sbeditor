@@ -10,7 +10,7 @@
  * @param int $width Width of the rich text editor in characters (defaults to 60)
  * @param int $height Height of the rich text editor in characters (defaults to 20)
  */
-function displayHTMLEditor($id, $name, $iframePage, $iconsPath, $contents = NULL, $width=60, $height=20)
+function displayHTMLEditor($id, $name, $iframePage, $iconsPath, $contents = NULL, $width = 60, $height = 20)
 {
 	?>
 	<div class="sbeditor" id="<?php print($id); ?>">

@@ -9,6 +9,6 @@ function displayHTMLEditorField(HTMLEditorField $field)
 
 function displayEditableHTMLEditorField($name, HTMLEditorField $field)
 {
-	displayHTMLEditor($field->id, $name, $field->iframePage, $field->iconsPath, $field->value);
+	displayHTMLEditor($field->id, $name, $field->iframePage, $field->iconsPath, $field->value, $field->width, $field->height);
 }
 ?>

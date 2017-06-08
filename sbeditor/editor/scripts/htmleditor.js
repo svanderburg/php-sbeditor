@@ -184,14 +184,7 @@
 
     sbeditor.addImage = addImage;
 
-    /**
-     * Inserts HTML code in the given editor component.
-     *
-     * @param {String} id ID of the HTML editor
-     * @param {String} html HTML code to insert
-     */
-    function insertHTML(id, html) {
-        var editorDivElement = document.getElementById(id);
+    function insertHTMLIntoEditorDivElement(editorDivElement, html) {
         var iframeElement = editorDivElement.getElementsByTagName("div")[0].getElementsByTagName("iframe")[0];
         var iframeDocument = getIFrameDocument(iframeElement);
 
@@ -206,6 +199,19 @@
             /* Insert routine for other browsers */
             iframeDocument.execCommand("InsertHTML", false, html);
         }
+    }
+
+    sbeditor.insertHTMLIntoEditorDivElement = insertHTMLIntoEditorDivElement;
+
+    /**
+     * Inserts HTML code in the given editor component.
+     *
+     * @param {String} id ID of the HTML editor
+     * @param {String} html HTML code to insert
+     */
+    function insertHTML(id, html) {
+        var editorDivElement = document.getElementById(id);
+        insertHTMLIntoEditorDiv(editorDivElement, html);
     }
     
     sbeditor.insertHTML = insertHTML;

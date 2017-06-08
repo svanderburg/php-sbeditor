@@ -14,13 +14,17 @@ class HTMLEditorField extends TextField
 	 * @param string $iframePage Path to an HTML page that is displayed in the editor iframe
 	 * @param string $iconsPath Path where the editor's icons can be found
 	 * @param bool $mandatory Indicates whether a given value is mandatory
+	 * @param int $width Width of the rich text editor in characters (defaults to 60)
+	 * @param int $height Height of the rich text editor in characters (defaults to 20)
 	 */
-	public function __construct($id, $title, $iframePage, $iconsPath, $mandatory = false)
+	public function __construct($id, $title, $iframePage, $iconsPath, $mandatory = false, $width = 60, $height = 20)
 	{
 		parent::__construct($title, $mandatory);
 		$this->id = $id;
 		$this->iframePage = $iframePage;
 		$this->iconsPath = $iconsPath;
+		$this->width = $width;
+		$this->height = $height;
 	}
 }
 ?>
