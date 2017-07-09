@@ -4,7 +4,7 @@ require_once("htmleditor.inc.php");
 
 function displayHTMLEditorField(HTMLEditorField $field)
 {
-	displayTextField($field);
+	print($field->value);
 }
 
 function displayEditableHTMLEditorField($name, HTMLEditorField $field)
