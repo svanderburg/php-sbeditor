@@ -46,9 +46,7 @@ Direct usage
 By invoking the `displayHTMLEditor()` function:
 
 ```php
-require_once("editor/view/html/htmleditor.inc.php");
-
-displayHTMLEditor("editor1", "contents", "iframepage.html", "image");
+\SBEditor\View\HTML\displayHTMLEditor("editor1", "contents", "iframepage.html", "image");
 ```
 
 we can directly generate a `div` providing a `textarea` and editor `iframe`.
@@ -65,7 +63,9 @@ construct fields that can be added to a `Form` managed by the `php-sbdata`
 framework:
 
 ```php
-require_once("editor/model/HTMLEditorField.class.php");
+use SBData\Model\Form;
+use SBData\Model\Field\TextField;
+use SBEditor\Model\Field\HTMLEditorField;
 
 $form = new Form(array(
     "title" => new TextField("Title", true),
@@ -76,9 +76,7 @@ $form = new Form(array(
 When displaying the above form as an editable form:
 
 ```php
-require_once("editor/view/html/htmleditorfield.inc.php");
-
-displayEditableForm($form,
+\SBData\View\HTML\displayEditableForm($form,
     "Submit",
     "One or more of the field values are incorrect!",
     "This field is incorrect!");

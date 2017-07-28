@@ -1,0 +1,33 @@
+{
+  "name": "svanderburg/php-sbeditor",
+  "description": "Simple embeddable HTML editor",
+  "type": "library",
+  "license": "Apache-2.0",
+  "authors": [
+      {
+          "name": "Sander van der Burg",
+          "email": "svanderburg@gmail.com",
+          "homepage": "http://sandervanderburg.nl"
+      }
+  ],
+  "autoload": {
+      "psr-4": {
+          "SBEditor\\": "src/SBEditor"
+      },
+      "files": [
+          "src/SBEditor/View/HTML/htmleditor.php",
+          "src/SBEditor/View/HTML/Field/htmleditorfield.php"
+      ]
+  },
+
+  "repositories": [
+      {
+          "type": "path",
+          "url": "../php-sbdata"
+      }
+  ],
+
+  "require-dev": {
+      "svanderburg/php-sbdata": "@dev"
+  }
+}

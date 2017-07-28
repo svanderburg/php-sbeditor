@@ -1,5 +1,6 @@
 <?php
-require_once("data/model/field/TextField.class.php");
+namespace SBEditor\Model\Field;
+use SBData\Model\Field\TextField;
 
 /**
  * Represents the structure of an editable editor that can be used to edit HTML.
@@ -25,6 +26,7 @@ class HTMLEditorField extends TextField
 		$this->iconsPath = $iconsPath;
 		$this->width = $width;
 		$this->height = $height;
+		$this->package = "SBEditor";
 	}
 }
 ?>

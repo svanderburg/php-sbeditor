@@ -1,13 +1,11 @@
 <?php
 error_reporting(E_STRICT | E_ALL);
 
-set_include_path("../../sbeditor:lib/sbdata");
+require_once("../../vendor/autoload.php");
 
-require_once("data/model/Form.class.php");
-require_once("data/model/field/TextField.class.php");
-require_once("editor/model/HTMLEditorField.class.php");
-require_once("data/view/html/form.inc.php");
-require_once("editor/view/html/htmleditorfield.inc.php");
+use SBData\Model\Form;
+use SBData\Model\Field\TextField;
+use SBEditor\Model\Field\HTMLEditorField;
 
 $form = new Form(array(
 	"title" => new TextField("Title", true),
@@ -40,7 +38,7 @@ if(count($_REQUEST) > 0)
 			<?php
 		}
 
-		displayEditableForm($form, "Submit", "One or more of the field values are incorrect!", "This field is incorrect!");
+		\SBData\View\HTML\displayEditableForm($form, "Submit", "One or more of the field values are incorrect!", "This field is incorrect!");
 		?>
 
 		<script type="text/javascript">

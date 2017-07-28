@@ -1,9 +1,7 @@
 <?php
 error_reporting(E_STRICT | E_ALL);
 
-set_include_path("../../sbeditor");
-
-require_once("editor/view/html/htmleditor.inc.php");
+require_once("../../vendor/autoload.php");
 ?>
 <!DOCTYPE html>
 
@@ -34,7 +32,7 @@ require_once("editor/view/html/htmleditor.inc.php");
 		?>
 		<form action="<?php print(htmlspecialchars($_SERVER["PHP_SELF"])); ?>" method="post">
 			<?php
-			displayHTMLEditor("editor1", "contents", "iframepage.html", "image", $contents);
+			\SBEditor\View\HTML\displayHTMLEditor("editor1", "contents", "iframepage.html", "image", $contents);
 			?>
 			<br>
 			<input type="submit" value="Submit">

@@ -1,4 +1,6 @@
 <?php
+namespace SBEditor\View\HTML;
+
 /**
  * Displays a HTML editor.
  *

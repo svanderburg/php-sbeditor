@@ -1,1 +1,1 @@
-../../sbeditor/editor/scripts/htmleditor.js
+../../src/SBEditor/scripts/htmleditor.js
