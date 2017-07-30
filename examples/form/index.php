@@ -9,7 +9,7 @@ use SBEditor\Model\Field\HTMLEditorField;
 
 $form = new Form(array(
 	"title" => new TextField("Title", true),
-	"contents" => new HTMLEditorField("editor1", "Contents", "iframepage.html", "image", true)
+	"contents" => new HTMLEditorField("editor1", "Contents", "iframepage.html", "image/editor", true)
 ));
 
 if(count($_REQUEST) > 0)
@@ -24,7 +24,7 @@ if(count($_REQUEST) > 0)
 	<head>
 		<title>HTML editor test</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
-		<script type="text/javascript" src="htmleditor.js"></script>
+		<script type="text/javascript" src="scripts/htmleditor.js"></script>
 	</head>
 	
 	<body>

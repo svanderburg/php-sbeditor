@@ -9,7 +9,7 @@ require_once("../../vendor/autoload.php");
 	<head>
 		<title>HTML editor test</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
-		<script type="text/javascript" src="htmleditor.js"></script>
+		<script type="text/javascript" src="scripts/htmleditor.js"></script>
 	</head>
 
 	<body>
@@ -32,7 +32,7 @@ require_once("../../vendor/autoload.php");
 		?>
 		<form action="<?php print(htmlspecialchars($_SERVER["PHP_SELF"])); ?>" method="post">
 			<?php
-			\SBEditor\View\HTML\displayHTMLEditor("editor1", "contents", "iframepage.html", "image", $contents);
+			\SBEditor\View\HTML\displayHTMLEditor("editor1", "contents", "iframepage.html", "image/editor", $contents);
 			?>
 			<br>
 			<input type="submit" value="Submit">

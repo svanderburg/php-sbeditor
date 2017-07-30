@@ -1,1 +1,0 @@
-../../src/SBEditor/scripts/htmleditor.js
