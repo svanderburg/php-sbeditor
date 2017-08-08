@@ -4,17 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd11e5edcb8345b2372b1f84cb86a5fc",
+    "content-hash": "0ed751a0b3a3a3012760744fd7e526b6",
     "packages": [],
     "packages-dev": [
         {
             "name": "svanderburg/php-sbdata",
-            "version": "dev-composer",
-            "dist": {
-                "type": "path",
-                "url": "../php-sbdata",
-                "reference": "59af3815762a9193e7bd570eeb72656f834aa51d",
-                "shasum": null
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/svanderburg/php-sbdata.git",
+                "reference": "78f4c2d4aabf7373fdf4edc7db1a76cf365ae905"
+            },
+            "require-dev": {
+                "abeautifulsite/simple-php-captcha": "1.0.x",
+                "phpunit/phpunit": "4.x"
             },
             "type": "library",
             "autoload": {
@@ -43,8 +46,12 @@
             },
             "autoload-dev": {
                 "psr-4": {
-                    "Examples\\Books\\": "examples/books/includes"
-                }
+                    "Examples\\Books\\": "examples/books/includes",
+                    "Examples\\CAPTCHA\\": "examples/captcha/includes"
+                },
+                "files": [
+                    "examples/captcha/includes/View/HTML/Field/captchafield.php"
+                ]
             },
             "license": [
                 "Apache-2.0"
@@ -56,11 +63,12 @@
                     "homepage": "http://sandervanderburg.nl"
                 }
             ],
-            "description": "Abstractions to deal with checking and displaying fields, forms and tables in web applications"
+            "description": "Abstractions to deal with checking and displaying fields, forms and tables in web applications",
+            "time": "2017-08-03T21:55:29+00:00"
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "svanderburg/php-sbdata": 20
     },

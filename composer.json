@@ -22,12 +22,14 @@
 
   "repositories": [
       {
-          "type": "path",
-          "url": "../php-sbdata"
+          "type": "git",
+          "url": "https://github.com/svanderburg/php-sbdata.git"
       }
   ],
 
+  "minimum-stability": "dev",
+
   "require-dev": {
-      "svanderburg/php-sbdata": "@dev"
+      "svanderburg/php-sbdata": "dev-master"
   }
 }
