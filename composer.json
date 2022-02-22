@@ -30,7 +30,6 @@
   "minimum-stability": "dev",
 
   "require-dev": {
-      "svanderburg/php-sbdata": "dev-master",
-      "phpdocumentor/phpdocumentor": "2.9.x"
+      "svanderburg/php-sbdata": "dev-master"
   }
 }
