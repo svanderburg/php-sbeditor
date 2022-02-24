@@ -1,18 +1,24 @@
 <?php
+/**
+ * @file
+ * @brief SBEditor-View-HTML module
+ * @defgroup SBEditor-View-HTML
+ * @{
+ */
 namespace SBEditor\View\HTML;
 
 /**
  * Displays a HTML editor.
  *
- * @param int $id ID of the HTML editor
- * @param string $name Name of the database column
- * @param string $iframePage HTML page to display in the iframe
- * @param string $iconsPath Path where to look for the editor's icons
- * @param string $contents HTML code to edit (defaults to NULL)
- * @param int $width Width of the rich text editor in characters (defaults to 60)
- * @param int $height Height of the rich text editor in characters (defaults to 20)
+ * @param $id ID of the HTML editor
+ * @param $name Name of the database column
+ * @param $iframePage HTML page to display in the iframe
+ * @param $iconsPath Path where to look for the editor's icons
+ * @param $contents HTML code to edit (defaults to NULL)
+ * @param $width Width of the rich text editor in characters (defaults to 60)
+ * @param $height Height of the rich text editor in characters (defaults to 20)
  */
-function displayHTMLEditor($id, $name, $iframePage, $iconsPath, $contents = NULL, $width = 60, $height = 20)
+function displayHTMLEditor(string $id, string $name, string $iframePage, string $iconsPath, string $contents = NULL, int $width = 60, int $height = 20): void
 {
 	?>
 	<div class="sbeditor" id="<?php print($id); ?>">
@@ -45,4 +51,8 @@ function displayHTMLEditor($id, $name, $iframePage, $iconsPath, $contents = NULL
 	</div>
 	<?php
 }
+
+/**
+ * @}
+ */
 ?>
