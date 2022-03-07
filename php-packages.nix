@@ -6,10 +6,10 @@ let
     "svanderburg/php-sbdata" = {
       targetDir = "";
       src = fetchgit {
-        name = "svanderburg-php-sbdata-cbe47d7b902779decd54399dac570beb1e75373a";
+        name = "svanderburg-php-sbdata-2532ede5954d15690cf6e00b6280a3ecd01aff4e";
         url = "https://github.com/svanderburg/php-sbdata.git";
-        rev = "cbe47d7b902779decd54399dac570beb1e75373a";
-        sha256 = "09kk38vccjwp7bdz1qh7czgf6ik6rxhzhv57x4ipz44jism9ly21";
+        rev = "2532ede5954d15690cf6e00b6280a3ecd01aff4e";
+        sha256 = "0l30w61pvd3c42l28g81z3ninj5hcv8q8kci8yaw57bkgvwfr447";
       };
     };
   };
@@ -17,7 +17,7 @@ in
 composerEnv.buildPackage {
   inherit packages devPackages noDev;
   name = "svanderburg-php-sbeditor";
-  src = ./.;
+  src = composerEnv.filterSrc ./.;
   executable = false;
   symlinkDependencies = false;
   meta = {

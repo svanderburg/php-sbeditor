@@ -13,7 +13,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/svanderburg/php-sbdata.git",
-                "reference": "464f01e87425d7c7f83fe8c8ff5f51b2738db8da"
+                "reference": "2532ede5954d15690cf6e00b6280a3ecd01aff4e"
             },
             "require-dev": {
                 "abeautifulsite/simple-php-captcha": "1.0.x",
@@ -65,7 +65,7 @@
                 }
             ],
             "description": "Abstractions to deal with checking and displaying fields, forms and tables in web applications",
-            "time": "2022-02-23T22:27:48+00:00"
+            "time": "2022-09-22T20:43:06+00:00"
         }
     ],
     "aliases": [],
@@ -77,5 +77,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }
