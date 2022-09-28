@@ -1,11 +1,12 @@
 <?php
 namespace SBEditor\Model\Field;
-use SBData\Model\Field\TextField;
+use SBData\Model\Field\Field;
+use SBData\Model\Value\Value;
 
 /**
  * Represents the structure of an editable editor that can be used to edit HTML.
  */
-class HTMLEditorField extends TextField
+class HTMLEditorField extends Field
 {
 	/** A unique identifier for the editor div */
 	public string $id;
@@ -38,7 +39,7 @@ class HTMLEditorField extends TextField
 	 */
 	public function __construct(string $id, string $title, string $iframePage, string $iconsPath, bool $mandatory = false, int $width = 60, int $height = 20)
 	{
-		parent::__construct($title, $mandatory);
+		parent::__construct($title, new Value($mandatory));
 		$this->id = $id;
 		$this->iframePage = $iframePage;
 		$this->iconsPath = $iconsPath;
