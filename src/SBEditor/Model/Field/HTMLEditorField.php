@@ -1,12 +1,12 @@
 <?php
 namespace SBEditor\Model\Field;
-use SBData\Model\Field\Field;
+use SBData\Model\Field\VisibleField;
 use SBData\Model\Value\Value;
 
 /**
  * Represents the structure of an editable editor that can be used to edit HTML.
  */
-class HTMLEditorField extends Field
+class HTMLEditorField extends VisibleField
 {
 	/** A unique identifier for the editor div */
 	public string $id;
