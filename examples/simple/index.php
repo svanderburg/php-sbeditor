@@ -30,7 +30,7 @@ require_once("../../vendor/autoload.php");
 		else
 			$contents = NULL;
 		?>
-		<form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post">
+		<form action="" method="post">
 			<?php
 			\SBEditor\View\HTML\displayHTMLEditor("editor1", "contents", "iframepage.html", "image/editor", $contents);
 			?>
