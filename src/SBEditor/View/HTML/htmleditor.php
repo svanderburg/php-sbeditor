@@ -14,11 +14,11 @@ namespace SBEditor\View\HTML;
  * @param $name Name of the database column
  * @param $iframePage HTML page to display in the iframe
  * @param $iconsPath Path where to look for the editor's icons
- * @param $contents HTML code to edit (defaults to NULL)
+ * @param $contents HTML code to edit (defaults to an empty string)
  * @param $width Width of the rich text editor in characters (defaults to 60)
  * @param $height Height of the rich text editor in characters (defaults to 20)
  */
-function displayHTMLEditor(string $id, string $name, string $iframePage, string $iconsPath, string $contents = NULL, int $width = 60, int $height = 20): void
+function displayHTMLEditor(string $id, string $name, string $iframePage, string $iconsPath, ?string $contents = "", int $width = 60, int $height = 20): void
 {
 	?>
 	<div class="sbeditor" id="<?= $id ?>">
@@ -29,6 +29,9 @@ function displayHTMLEditor(string $id, string $name, string $iframePage, string 
 				<option value="<h1>">Heading 1</option>
 				<option value="<h2>">Heading 2</option>
 				<option value="<h3>">Heading 3</option>
+				<option value="<h4>">Heading 4</option>
+				<option value="<h5>">Heading 5</option>
+				<option value="<h6>">Heading 6</option>
 				<option value="<blockquote>">Blockquote</option>
 				<option value="<pre>">Preformatted</option>
 			</select><br>
@@ -36,6 +39,7 @@ function displayHTMLEditor(string $id, string $name, string $iframePage, string 
 			<button onclick="sbeditor.doRichEditCommand('<?= $id ?>', 'subscript'); return false;">S<sub>ubscript</sub></button>
 			<button onclick="sbeditor.doRichEditCommand('<?= $id ?>', 'superscript'); return false;">S<sup>uperscript</sup></button>&nbsp;|&nbsp;
 			<button onclick="sbeditor.addLink('<?= $id ?>'); return false;"><img src="<?= $iconsPath ?>/a.gif" alt="Add link"></button>
+			<button onclick="sbeditor.doRichEditCommand('<?= $id ?>', 'unlink'); return false;"><img src="<?= $iconsPath ?>/a-remove.gif" alt="Remove link"></button>
 			<button onclick="sbeditor.addImage('<?= $id ?>'); return false;"><img src="<?= $iconsPath ?>/img.gif" alt="Add image"></button>&nbsp;|&nbsp;
 			<button onclick="sbeditor.doRichEditCommand('<?= $id ?>', 'InsertUnorderedList'); return false;"><img src="<?= $iconsPath ?>/ul.gif" alt="Add unordered list"></button>
 			<button onclick="sbeditor.doRichEditCommand('<?= $id ?>', 'InsertOrderedList'); return false;"><img src="<?= $iconsPath ?>/ol.gif" alt="Add ordered list"></button>&nbsp;|&nbsp;
@@ -45,7 +49,7 @@ function displayHTMLEditor(string $id, string $name, string $iframePage, string 
 			<iframe src="<?= $iframePage ?>" style="<?= "width: ".$width."em; height: ".$height."em;" ?>"></iframe>
 		</div>
 		<div>
-			<textarea name="<?= $name ?>" cols="<?= $width ?>" rows="<?= $height ?>"><?php if($contents != NULL) print(htmlentities($contents)); ?></textarea>
+			<textarea name="<?= $name ?>" cols="<?= $width ?>" rows="<?= $height ?>"><?= htmlentities($contents) ?></textarea>
 		</div>
 		<input type="checkbox" onclick="sbeditor.toggleView('<?= $id ?>', this.checked);" checked>View source
 	</div>
