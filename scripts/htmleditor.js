@@ -7,6 +7,9 @@
 (function() {
     var sbeditor = {};
 
+    ////////// Utility functions
+
+    /* Provides an interface that gives the document object to be edited in the iframe */
     function getIFrameDocument(iframeElement) {
         if (iframeElement.contentDocument) {
             return iframeElement.contentDocument; // For normal browsers
@@ -15,20 +18,8 @@
        }
     }
 
-    /* Enables the design mode of an iframe in the given div element */
-    function enableDesignMode(htmlDivElement) {
-        var iframeElement = htmlDivElement.getElementsByTagName("iframe")[0];
-        var iframeDocument = getIFrameDocument(iframeElement);
-
-        if(navigator.appName.indexOf("Microsoft") != -1) {
-            iframeDocument.body.contentEditable = true;
-        } else {
-            iframeDocument.designMode = "On";
-        }
-    }
-
     /* Make editor visible and textarea invisible */
-    function switchHTML(htmlDivElement, textAreaDivElement) {
+    function switchToHTML(htmlDivElement, textAreaDivElement) {
         if(htmlDivElement.style.display != "block") {
             htmlDivElement.style.display = "block";
             textAreaDivElement.style.display = "none";
@@ -42,7 +33,7 @@
     }
 
     /* Make editor invisible and textarea visible */
-    function switchTextArea(htmlDivElement, textAreaDivElement) {
+    function switchToTextArea(htmlDivElement, textAreaDivElement) {
         if(textAreaDivElement.style.display != "block") {
             htmlDivElement.style.display = "none";
             textAreaDivElement.style.display = "block";
@@ -55,12 +46,194 @@
         }
     }
 
+    /* Provides an interface that exposes the HTML editor and text areas inside the provided editor div */
     function extractDivElements(editorDivElement) {
         var divElements = editorDivElement.getElementsByTagName("div");
         return {
-            htmlDivElement: divElements[0],
-            textAreaDivElement: divElements[1]
+            htmlDivElement: divElements[1],
+            textAreaDivElement: divElements[0]
         };
+    }
+
+    ///////// Functionality that adds editor capabilities to a textarea div
+
+    function createIFrame(iframePage, width, height) {
+        var iframe = document.createElement("iframe");
+        iframe.src = iframePage;
+        iframe.style.width = width + "em";
+        iframe.style.height = height + "em";
+        return iframe;
+    }
+
+    function createOptionElement(value, text) {
+        var option = document.createElement("option");
+        option.value = value;
+        option.text = text;
+        return option;
+    }
+
+    function createStyleSelectBox(iframe) {
+        var selectBox = document.createElement("select");
+        selectBox.add(createOptionElement("", "[Style]"));
+        selectBox.add(createOptionElement("<p>", "Paragraph"));
+        selectBox.add(createOptionElement("<h1>", "Heading 1"));
+        selectBox.add(createOptionElement("<h2>", "Heading 2"));
+        selectBox.add(createOptionElement("<h3>", "Heading 3"));
+        selectBox.add(createOptionElement("<h4>", "Heading 4"));
+        selectBox.add(createOptionElement("<h5>", "Heading 5"));
+        selectBox.add(createOptionElement("<h6>", "Heading 6"));
+        selectBox.add(createOptionElement("<blockquote>", "Blockquote"));
+        selectBox.add(createOptionElement("<pre>", "Preformatted"));
+        selectBox.onchange = function() {
+            doRichEditCommand(iframe, "formatBlock", this.options[this.selectedIndex].value);
+        };
+        return selectBox;
+    }
+
+    function createDelimiter() {
+        var noBreakSpace = String.fromCharCode(160);
+        return document.createTextNode(noBreakSpace + "|" + noBreakSpace);
+    }
+
+    function createEditorButton(innerHTML, onclick) {
+        var button = document.createElement("button");
+        button.innerHTML = innerHTML;
+        button.onclick = onclick;
+        return button;
+    }
+
+    function createEditorDiv(iconsPath, iframePage, width, height) {
+        var div = document.createElement("div");
+        div.style.display = "none";
+
+        // Create iframe
+        var iframe = createIFrame(iframePage, width, height);
+
+        // Create select style section
+        div.appendChild(createStyleSelectBox(iframe));
+        div.appendChild(document.createElement("br"));
+
+        // Create highlight button
+        div.appendChild(createEditorButton("<strong>Highlight</strong>", function() {
+            return doRichEditCommand(iframe, "bold");
+        }));
+
+        // Create subscript button
+        div.appendChild(createEditorButton("S<sub>ubscript</sub>", function() {
+            return doRichEditCommand(iframe, "subscript");
+        }));
+
+        // Create superscript button
+        div.appendChild(createEditorButton("S<sup>uperscript</sup>", function() {
+            return doRichEditCommand(iframe, "superscript");
+        }));
+
+        // Create delimiter
+        div.appendChild(createDelimiter());
+
+        // Create link button
+        div.appendChild(createEditorButton('<img src="' + iconsPath + '/a.gif" alt="Add link">', function() {
+            return addLink(iframe);
+        }));
+
+        // Create unlink button
+        div.appendChild(createEditorButton('<img src="' + iconsPath + '/a-remove.gif" alt="Remove link">', function() {
+            return doRichEditCommand(iframe, "unlink");
+        }));
+
+        // Create add image button
+        div.appendChild(createEditorButton('<img src="' + iconsPath + '/img.gif" alt="Add image">', function() {
+            return addImage(iframe);
+        }));
+
+        // Create delimiter
+        div.appendChild(createDelimiter());
+
+        // Add unordered list button
+        div.appendChild(createEditorButton('<img src="' + iconsPath + '/ul.gif" alt="Add unordered list">', function() {
+            return doRichEditCommand(iframe, "InsertUnorderedList");
+        }));
+
+        // Add ordered list button
+        div.appendChild(createEditorButton('<img src="' + iconsPath + '/ol.gif" alt="Add ordered list">', function() {
+            return doRichEditCommand(iframe, "InsertOrderedList");
+        }));
+
+        // Create delimiter
+        div.appendChild(createDelimiter());
+
+        // Create table with horizontal header button
+        div.appendChild(createEditorButton('<img src="' + iconsPath + '/table_hh.gif" alt="Add table with horizontal header">', function() {
+            return addTableWithHorizontalHeader(iframe);
+        }));
+
+        // Create table with vertical header button
+        div.appendChild(createEditorButton('<img src="' + iconsPath + '/table_vh.gif" alt="Add table with vertical header">', function() {
+            return addTableWithVerticalHeader(iframe);
+        }));
+
+        // Create table without border button
+        div.appendChild(createEditorButton('<img src="' + iconsPath + '/table_vh.gif" alt="Add table without border">', function() {
+            return addTableWithoutBorder(iframe);
+        }));
+
+        // Create delimiter
+        div.appendChild(createDelimiter());
+        div.appendChild(document.createElement("br"));
+
+        // Add editable iframe
+        div.appendChild(iframe);
+
+        // Return the div
+        return div;
+    }
+
+    function createViewSourceCheckBox(div) {
+        var checkBox = document.createElement("input");
+        checkBox.type = "checkbox";
+        checkBox.checked = true;
+        checkBox.onclick = function() {
+            var divElements = extractDivElements(div);
+
+            if(this.checked) {
+                switchToTextArea(divElements.htmlDivElement, divElements.textAreaDivElement);
+            } else {
+                switchToHTML(divElements.htmlDivElement, divElements.textAreaDivElement);
+            }
+        };
+        return checkBox;
+    }
+
+    /**
+     * Adds editor capabilities to a div element that embeds a text area.
+     *
+     * @param {String} id ID of the div to augment
+     * @param {String} iconsPath Path in which the editor icons reside
+     * @param {String} iframePage Path to an HTML page that is displayed inside the editor iframe
+     * @param {number} width Width of the editor (in em)
+     * @param {number} height Height of the editor (in em)
+     */
+    function addEditorCapabilities(id, iconsPath, iframePage, width, height) {
+        var div = document.getElementById(id);
+
+        div.appendChild(createEditorDiv(iconsPath, iframePage, width, height));
+        div.appendChild(createViewSourceCheckBox(div));
+        div.appendChild(document.createTextNode("View source"));
+    }
+
+    sbeditor.addEditorCapabilities = addEditorCapabilities;
+
+    ////////// Functions that do the initialization on loading the page
+
+    function enableDesignMode(htmlDivElement) {
+        var iframeElement = htmlDivElement.getElementsByTagName("iframe")[0];
+        var iframeDocument = getIFrameDocument(iframeElement);
+
+        if(navigator.appName.indexOf("Microsoft") != -1) {
+            iframeDocument.body.contentEditable = true;
+        } else {
+            iframeDocument.designMode = "On";
+        }
     }
 
     function initEditor(editorDivElements) {
@@ -70,7 +243,7 @@
             var divElements = extractDivElements(editorDivElement);
 
             /* Switch to HTML editor mode and enable design mode in the iframe */
-            switchHTML(divElements.htmlDivElement, divElements.textAreaDivElement);
+            switchToHTML(divElements.htmlDivElement, divElements.textAreaDivElement);
             enableDesignMode(divElements.htmlDivElement);
 
             /* Uncheck the checkbox element */
@@ -95,13 +268,13 @@
             var formElement = formElements[i];
             var editorDivElements = formElement.getElementsByClassName("sbeditor");
 
-            /* Add a submit handler to each form */
+            /* Add a submit handler to each form that updates the textarea before submitting */
             formElement.onsubmit = function() {
                 for(var i = 0; i < editorDivElements.length; i++) {
                     var editorDivElement = editorDivElements[i];
 
                     var divElements = extractDivElements(editorDivElement);
-                    switchTextArea(divElements.htmlDivElement, divElements.textAreaDivElement);
+                    switchToTextArea(divElements.htmlDivElement, divElements.textAreaDivElement);
                 }
             };
 
@@ -120,72 +293,52 @@
             enableEditors(param);
         };
     }
-    
+
     sbeditor.initEditors = initEditors;
 
-    /**
-     * Executes a rich text edit command in a given editor component.
-     *
-     * @param {String} id ID of the HTML editor
-     * @param {String} command Rich text edit command to execute
-     * @param {String} arg Arguments of the richt text editor command
-     */
-    function doRichEditCommand(id, command, arg) {
-        var editorDivElement = document.getElementById(id);
-        var iframeElement = editorDivElement.getElementsByTagName("div")[0].getElementsByTagName("iframe")[0];
+    ////////// Functions that implement editor actions
 
+    function doRichEditCommand(iframeElement, command, arg) {
         iframeElement.contentWindow.focus();
         getIFrameDocument(iframeElement).execCommand(command, false, arg);
         iframeElement.contentWindow.focus();
+        return false;
     }
 
-    sbeditor.doRichEditCommand = doRichEditCommand;
-
-    /**
-     * Creates a hyperlink and attaches it to the given document.
-     *
-     * @param {String} id ID of the HTML editor
-     */
-    function addLink(id) {
+    function addLink(iframe) {
         var url = prompt("Enter link URL:", "http://");
 
-        if(url == "") {
+        if(url === null || url == "") {
             alert("You must provide a URL!");
         } else {
-            doRichEditCommand(id, "createLink", url);
+            doRichEditCommand(iframe, "createLink", url);
         }
-    }
-    
-    sbeditor.addLink = addLink;
 
-    /**
-     * Attaches an image to the given editor.
-     *
-     * @param {String} id ID of the HTML editor
-     */
-    function addImage(id) {
+        return false;
+    }
+
+    function addImage(iframe) {
         var url = prompt("Enter image URL:", "http://");
 
         if(url === null || url == "") {
             alert("You must provide an URL!");
-            return;
+            return false;
         }
 
         var alt = prompt("Enter alternate text:", "image");
 
         if(alt === null || alt == "") {
             alert("You must provide alternate text!");
-            return;
+            return false;
         }
 
         var html = '<img src="'+url+'" alt="'+alt+'">';
-        insertHTML(id, html);
+        insertHTML(iframe, html);
+
+        return false;
     }
 
-    sbeditor.addImage = addImage;
-
-    function insertHTMLIntoEditorDivElement(editorDivElement, html) {
-        var iframeElement = editorDivElement.getElementsByTagName("div")[0].getElementsByTagName("iframe")[0];
+    function insertHTML(iframeElement, html) {
         var iframeDocument = getIFrameDocument(iframeElement);
 
         if(navigator.appName.indexOf("Microsoft") != -1) {
@@ -199,22 +352,9 @@
             /* Insert routine for other browsers */
             iframeDocument.execCommand("InsertHTML", false, html);
         }
-    }
 
-    sbeditor.insertHTMLIntoEditorDivElement = insertHTMLIntoEditorDivElement;
-
-    /**
-     * Inserts HTML code in the given editor component.
-     *
-     * @param {String} id ID of the HTML editor
-     * @param {String} html HTML code to insert
-     */
-    function insertHTML(id, html) {
-        var editorDivElement = document.getElementById(id);
-        insertHTMLIntoEditorDiv(editorDivElement, html);
+        return false;
     }
-    
-    sbeditor.insertHTML = insertHTML;
 
     function queryRows() {
         var rows = prompt("Number of rows (excluding the header):", "1");
@@ -240,17 +380,12 @@
         return cols;
     }
 
-    /**
-     * Adds a table with a horizontal header to the given editor component.
-     *
-     * @param {String} id ID of the HTML editor
-     */
-    function addTableWithHorizontalHeader(id) {
+    function addTableWithHorizontalHeader(iframe) {
         try {
             var rows = queryRows();
             var cols = queryCols();
         } catch(e) {
-            return;
+            return false;
         }
 
         var html = "<table>\n";
@@ -282,22 +417,17 @@
         html += "</table>\n";
 
         /* Add generated HTML to the document */
-        insertHTML(id, html);
+        insertHTML(iframe, html);
+
+        return false;
     }
 
-    sbeditor.addTableWithHorizontalHeader = addTableWithHorizontalHeader;
-
-    /**
-     * Adds a table with a vertical header to the given editor component.
-     *
-     * @param {String} id ID of the HTML editor
-     */
-    function addTableWithVerticalHeader(id) {
+    function addTableWithVerticalHeader(iframe) {
         try {
             var rows = queryRows();
             var cols = queryCols();
         } catch(e) {
-            return;
+            return false;
         }
 
         var html = "<table>\n";
@@ -322,22 +452,17 @@
         html += "</table>\n";
 
         /* Add generated HTML to the document */
-        insertHTML(id, html);
+        insertHTML(iframe, html);
+
+        return false;
     }
 
-    sbeditor.addTableWithVerticalHeader = addTableWithVerticalHeader;
-
-    /**
-     * Adds a table without a border to the given editor component.
-     *
-     * @param {String} id ID of the HTML editor
-     */
-    function addTableWithoutBorder(id) {
+    function addTableWithoutBorder(iframe) {
         try {
             var rows = queryRows();
             var cols = queryCols();
         } catch(e) {
-            return;
+            return false;
         }
 
         var html = '<table class="noborder">\n';
@@ -359,29 +484,10 @@
         html += "</table>\n";
 
         /* Add generated HTML to the document */
-        insertHTML(id, html);
+        insertHTML(iframe, html);
+
+        return false;
     }
-
-    sbeditor.addTableWithoutBorder = addTableWithoutBorder;
-
-    /**
-     * Changes the view of the rich text editor
-     *
-     * @param {String} id ID of the rich text editor
-     * @param {Boolean} checked true to switch to the textarea view, false to switch to the editor view
-     */
-    function toggleView(id, checked) {
-        var editorDivElement = document.getElementById(id);
-        var divElements = extractDivElements(editorDivElement);
-
-        if(checked) {
-            switchTextArea(divElements.htmlDivElement, divElements.textAreaDivElement);
-        } else {
-            switchHTML(divElements.htmlDivElement, divElements.textAreaDivElement);
-        }
-    }
-
-    sbeditor.toggleView = toggleView;
 
     this.sbeditor = sbeditor;
 })();

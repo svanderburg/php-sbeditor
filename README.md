@@ -60,8 +60,8 @@ the the `htmleditor.js` script file in the header of a web page:
 <script type="text/javascript" src="htmleditor.js"></script>
 ```
 
-And run the following function call in the body to enable the editors in the
-forms on the page:
+And run the following function call in the end of the body to enable the editors
+in the forms on the page:
 
 ```html
 <script type="text/javascript">
