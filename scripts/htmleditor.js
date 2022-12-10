@@ -338,6 +338,12 @@
         return false;
     }
 
+    /**
+     * Inserts HTML code into an iframe element's document
+     *
+     * @param {HTMLIFrameElement} iframeElement iframe element to insert code into
+     * @param {String} html HTML code to insert
+     */
     function insertHTML(iframeElement, html) {
         var iframeDocument = getIFrameDocument(iframeElement);
 
@@ -355,6 +361,8 @@
 
         return false;
     }
+
+    sbeditor.insertHTML = insertHTML;
 
     function queryRows() {
         var rows = prompt("Number of rows (excluding the header):", "1");
