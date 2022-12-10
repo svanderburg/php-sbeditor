@@ -13,7 +13,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/svanderburg/php-sbdata.git",
-                "reference": "ee777698c697ddee23e060db9621487022f76c11"
+                "reference": "abaed513ead847b98696797467bc8c8422a64d17"
             },
             "require-dev": {
                 "abeautifulsite/simple-php-captcha": "1.0.x",
@@ -30,6 +30,7 @@
                     "src/SBData/View/HTML/pager.php",
                     "src/SBData/View/HTML/pageddbtable.php",
                     "src/SBData/View/HTML/form.php",
+                    "src/SBData/View/HTML/util.php",
                     "src/SBData/View/HTML/field.php",
                     "src/SBData/View/HTML/Field/acceptablefilenamefield.php",
                     "src/SBData/View/HTML/Field/arraycomboboxfield.php",
@@ -79,7 +80,7 @@
                 }
             ],
             "description": "Abstractions to deal with checking and displaying fields, forms and tables in web applications",
-            "time": "2022-12-06T21:09:01+00:00"
+            "time": "2022-12-10T14:55:09+00:00"
         }
     ],
     "aliases": [],
