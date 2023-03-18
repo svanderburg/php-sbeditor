@@ -38,7 +38,7 @@ if(count($_REQUEST) > 0)
 			<?php
 		}
 
-		\SBData\View\HTML\displayEditableForm($form, "Submit", "One or more of the field values are incorrect!", "This field is incorrect!");
+		\SBData\View\HTML\displayEditableForm($form);
 		?>
 
 		<script type="text/javascript">
