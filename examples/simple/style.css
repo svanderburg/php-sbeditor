@@ -22,3 +22,28 @@ form input
 {
 	display: table-cell;
 }
+
+table
+{
+	border-style: solid;
+	border-width: 1px;
+	border-color: #000000;
+}
+
+th, td
+{
+	border-style: solid;
+	border-width: 1px;
+	border-color: #000000;
+}
+
+th
+{
+	background-color: #aaaaaa;
+}
+
+table.noborder, table.noborder th, table.noborder td
+{
+	border-style: none;
+	background-color: transparent;
+}

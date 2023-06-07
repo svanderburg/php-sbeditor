@@ -7,7 +7,423 @@
 (function() {
     var sbeditor = {};
 
-    ////////// Utility functions
+    ////////// SBEditor class
+
+    var sbEditorLabels = {
+        "View source": "View source",
+        "[Style]": "[Style]",
+        "Paragraph": "Paragraph",
+        "Heading 1": "Heading 1",
+        "Heading 2": "Heading 2",
+        "Heading 3": "Heading 3",
+        "Heading 4": "Heading 4",
+        "Heading 5": "Heading 5",
+        "Heading 6": "Heading 6",
+        "Blockquote": "Blockquote",
+        "Preformatted": "Preformatted",
+        "Enter link URL:": "Enter link URL:",
+        "Enter image URL:": "Enter image URL:",
+        "You must provide an URL!": "You must provide an URL!",
+        "Enter alternate text:": "Enter alternate text:",
+        "You must provide alternate text!": "You must provide alternate text!",
+        "Number of rows:": "Number of rows (excluding the header):",
+        "Number of columns:": "Number of columns:",
+        "You must specify at least one row!": "You must specify at least one row!",
+        "You must specify at least one column!": "You must specify at least one column!",
+        "Highlight": "<strong>Highlight</strong>",
+        "Subscript": "S<sub>ubscript</sub>",
+        "Superscript": "S<sup>uperscript</sup>",
+        "Add link": "Add link",
+        "Remove link": "Remove link",
+        "Add image": "Add image",
+        "Add unordered list": "Add unordered list",
+        "Add ordered list": "Add ordered list",
+        "Add table with horizontal header": "Add table with horizontal header",
+        "Add table with vertical header": "Add table with vertical header",
+        "Add table without border": "Add table without border"
+    };
+
+    /**
+     * Creates a new SBEditor object that turns a div with a textarea into a rich text editor.
+     *
+     * @param {String} iconsPath Path in which the editor icons reside
+     * @param {String} iframePage Path to an HTML page that is displayed inside the editor iframe
+     * @param {number} width Width of the editor (in em)
+     * @param {number} height Height of the editor (in em)
+     * @param {Object} labels An object that translates every label. If none is given, the editor uses the default labels
+     */
+    function SBEditor(iconsPath, iframePage, width, height, labels) {
+        this.iconsPath = iconsPath;
+        this.iframePage = iframePage;
+        this.width = width;
+        this.height = height;
+
+        if(labels === undefined) {
+            this.labels = sbEditorLabels;
+        } else {
+            this.labels = labels;
+        }
+    }
+
+    sbeditor.SBEditor = SBEditor;
+
+    /**
+     * Adds editor capabilities to a div with a textarea
+     *
+     * @param {String} divId Id of the div
+     */
+    SBEditor.prototype.addEditorCapabilities = function(divId) {
+        var div = document.getElementById(divId);
+
+        div.appendChild(this.createEditorDiv());
+        div.appendChild(createViewSourceCheckBox(div));
+        div.appendChild(document.createTextNode(this.labels["View source"]));
+    };
+
+    ////////// Editor callbacks
+
+    function doRichEditCommand(iframeElement, command, arg) {
+        iframeElement.contentWindow.focus();
+        getIFrameDocument(iframeElement).execCommand(command, false, arg);
+        iframeElement.contentWindow.focus();
+        return false;
+    }
+
+    SBEditor.prototype.addLink = function(iframe) {
+        var url = prompt(this.labels["Enter link URL:"], "http://");
+
+        if(url === null || url == "") {
+            alert(this.labels["You must provide a URL!"]);
+        } else {
+            doRichEditCommand(iframe, "createLink", url);
+        }
+
+        return false;
+    };
+
+    SBEditor.prototype.addImage = function(iframe) {
+        var url = prompt(this.labels["Enter image URL:"], "http://");
+
+        if(url === null || url == "") {
+            alert(this.labels["You must provide an URL!"]);
+            return false;
+        }
+
+        var alt = prompt(this.labels["Enter alternate text:"], "image");
+
+        if(alt === null || alt == "") {
+            alert(this.labels["You must provide alternate text!"]);
+            return false;
+        }
+
+        var html = '<img src="'+url+'" alt="'+alt+'">';
+        insertHTML(iframe, html);
+
+        return false;
+    };
+
+    /**
+     * Inserts HTML code into an iframe element's document
+     *
+     * @param {HTMLIFrameElement} iframeElement iframe element to insert code into
+     * @param {String} html HTML code to insert
+     */
+    function insertHTML(iframeElement, html) {
+        var iframeDocument = getIFrameDocument(iframeElement);
+
+        if(navigator.appName.indexOf("Microsoft") != -1) {
+            /* Insert routine for Internet Explorer */
+            iframeDocument.body.focus();
+            var range = iframeDocument.selection.createRange();
+            range.pasteHTML(html);
+            range.collapse(false);
+            range.select();
+        } else {
+            /* Insert routine for other browsers */
+            iframeDocument.execCommand("InsertHTML", false, html);
+        }
+
+        return false;
+    }
+
+    sbeditor.insertHTML = insertHTML;
+
+    SBEditor.prototype.queryRows = function() {
+        var rows = prompt(this.labels["Number of rows:"], "1");
+        rows = parseInt(rows);
+
+        if(isNaN(rows) || rows <= 0) {
+            alert(this.labels["You must specify at least one row!"]);
+            throw this.labels["You must specify at least one row!"];
+        }
+
+        return rows;
+    };
+
+    SBEditor.prototype.queryCols = function() {
+        var cols = prompt(this.labels["Number of columns:"], "1");
+        cols = parseInt(cols);
+
+        if(isNaN(cols) || cols <= 0) {
+            alert(this.labels["You must specify at least one column!"]);
+            throw this.labels["You must specify at least one column!"];
+        }
+
+        return cols;
+    };
+
+    SBEditor.prototype.addTableWithHorizontalHeader = function(iframe) {
+        try {
+            var rows = this.queryRows();
+            var cols = this.queryCols();
+        } catch(e) {
+            return false;
+        }
+
+        var html = "<table>\n";
+
+        /* Add table header */
+
+        html += "<tr>\n";
+
+        for(var j = 0; j < cols; j++) {
+            html += "<th>&nbsp;</th>\n";
+        }
+
+        html += "</tr>\n";
+
+        /* Add each row to the document */
+
+        for(var i = 0; i < rows; i++) {
+            html += "<tr>\n";
+
+            /* Add each column to the document */
+
+            for(var j = 0; j < cols; j++) {
+                html += "<td>&nbsp;</td>\n";
+            }
+
+            html += "</tr>\n";
+        }
+
+        html += "</table>\n";
+
+        /* Add generated HTML to the document */
+        insertHTML(iframe, html);
+
+        return false;
+    };
+
+    SBEditor.prototype.addTableWithVerticalHeader = function(iframe) {
+        try {
+            var rows = this.queryRows();
+            var cols = this.queryCols();
+        } catch(e) {
+            return false;
+        }
+
+        var html = "<table>\n";
+
+        /* Add each row to the document */
+
+        for(var i = 0; i < rows; i++) {
+            html += "<tr>\n";
+
+            /* Add column header */
+            html += "<th>&nbsp;</th>";
+
+            /* Add each column to the document */
+
+            for(var j = 0; j < cols; j++) {
+                html += "<td>&nbsp;</td>\n";
+            }
+
+            html += "</tr>\n";
+        }
+
+        html += "</table>\n";
+
+        /* Add generated HTML to the document */
+        insertHTML(iframe, html);
+
+        return false;
+    };
+
+    SBEditor.prototype.addTableWithoutBorder = function(iframe) {
+        try {
+            var rows = this.queryRows();
+            var cols = this.queryCols();
+        } catch(e) {
+            return false;
+        }
+
+        var html = '<table class="noborder">\n';
+
+        /* Add each row to the document */
+
+        for(var i = 0; i < rows; i++) {
+            html += "<tr>\n";
+
+            /* Add each column to the document */
+
+            for(var j = 0; j < cols; j++) {
+                html += "<td>&nbsp;</td>\n";
+            }
+
+            html += "</tr>\n";
+        }
+
+        html += "</table>\n";
+
+        /* Add generated HTML to the document */
+        insertHTML(iframe, html);
+
+        return false;
+    };
+
+    ////////// Editor DOM objects
+
+    SBEditor.prototype.createIFrame = function() {
+        var iframe = document.createElement("iframe");
+        iframe.src = this.iframePage;
+        iframe.style.width = this.width + "em";
+        iframe.style.height = this.height + "em";
+        return iframe;
+    };
+
+    function createOptionElement(value, text) {
+        var option = document.createElement("option");
+        option.value = value;
+        option.text = text;
+        return option;
+    }
+
+    function createStyleSelectBox(iframe, labels) {
+        var selectBox = document.createElement("select");
+        selectBox.add(createOptionElement("", labels["[Style]"]));
+        selectBox.add(createOptionElement("<p>", labels["Paragraph"]));
+        selectBox.add(createOptionElement("<h1>", labels["Heading 1"]));
+        selectBox.add(createOptionElement("<h2>", labels["Heading 2"]));
+        selectBox.add(createOptionElement("<h3>", labels["Heading 3"]));
+        selectBox.add(createOptionElement("<h4>", labels["Heading 4"]));
+        selectBox.add(createOptionElement("<h5>", labels["Heading 5"]));
+        selectBox.add(createOptionElement("<h6>", labels["Heading 6"]));
+        selectBox.add(createOptionElement("<blockquote>", labels["Blockquote"]));
+        selectBox.add(createOptionElement("<pre>", labels["Preformatted"]));
+        selectBox.onchange = function() {
+            doRichEditCommand(iframe, "formatBlock", this.options[this.selectedIndex].value);
+        };
+        return selectBox;
+    }
+
+    function createDelimiter() {
+        var noBreakSpace = String.fromCharCode(160);
+        return document.createTextNode(noBreakSpace + "|" + noBreakSpace);
+    }
+
+    function createEditorButton(innerHTML, onclick) {
+        var button = document.createElement("button");
+        button.innerHTML = innerHTML;
+        button.onclick = onclick;
+        return button;
+    }
+
+    SBEditor.prototype.createEditorDiv = function() {
+        var self = this;
+
+        var div = document.createElement("div");
+        div.style.display = "none";
+
+        // Create iframe
+        var iframe = self.createIFrame();
+
+        // Create select style section
+        div.appendChild(createStyleSelectBox(iframe, self.labels));
+        div.appendChild(document.createElement("br"));
+
+        // Create highlight button
+        div.appendChild(createEditorButton(this.labels["Highlight"], function() {
+            return doRichEditCommand(iframe, "bold");
+        }));
+
+        // Create subscript button
+        div.appendChild(createEditorButton(this.labels["Subscript"], function() {
+            return doRichEditCommand(iframe, "subscript");
+        }));
+
+        // Create superscript button
+        div.appendChild(createEditorButton(this.labels["Superscript"], function() {
+            return doRichEditCommand(iframe, "superscript");
+        }));
+
+        // Create delimiter
+        div.appendChild(createDelimiter());
+
+        // Create link button
+        div.appendChild(createEditorButton('<img src="' + self.iconsPath + '/a.gif" alt="' + this.labels["Add link"] + '">', function() {
+            return self.addLink(iframe);
+        }));
+
+        // Create unlink button
+        div.appendChild(createEditorButton('<img src="' + self.iconsPath + '/a-remove.gif" alt="' + this.labels["Remove link"] + '">', function() {
+            return doRichEditCommand(iframe, "unlink");
+        }));
+
+        // Create add image button
+        div.appendChild(createEditorButton('<img src="' + self.iconsPath + '/img.gif" alt="' + this.labels["Add image"] + '">', function() {
+            return self.addImage(iframe);
+        }));
+
+        // Create delimiter
+        div.appendChild(createDelimiter());
+
+        // Add unordered list button
+        div.appendChild(createEditorButton('<img src="' + self.iconsPath + '/ul.gif" alt="' + this.labels["Add unordered list"] + '">', function() {
+            return doRichEditCommand(iframe, "InsertUnorderedList");
+        }));
+
+        // Add ordered list button
+        div.appendChild(createEditorButton('<img src="' + self.iconsPath + '/ol.gif" alt="' + this.labels["Add ordered list"] + '">', function() {
+            return doRichEditCommand(iframe, "InsertOrderedList");
+        }));
+
+        // Create delimiter
+        div.appendChild(createDelimiter());
+
+        // Create table with horizontal header button
+        div.appendChild(createEditorButton('<img src="' + self.iconsPath + '/table_hh.gif" alt="' + this.labels["Add table with horizontal header"] + '">', function() {
+            return self.addTableWithHorizontalHeader(iframe);
+        }));
+
+        // Create table with vertical header button
+        div.appendChild(createEditorButton('<img src="' + self.iconsPath + '/table_vh.gif" alt="' + this.labels["Add table with vertical header"] + '">', function() {
+            return self.addTableWithVerticalHeader(iframe);
+        }));
+
+        // Create table without border button
+        div.appendChild(createEditorButton('<img src="' + self.iconsPath + '/table_nb.gif" alt="' + this.labels["Add table without border"] + '">', function() {
+            return self.addTableWithoutBorder(iframe);
+        }));
+
+        // Create delimiter
+        div.appendChild(createDelimiter());
+        div.appendChild(document.createElement("br"));
+
+        // Add editable iframe
+        div.appendChild(iframe);
+
+        // Return the div
+        return div;
+    };
+
+    /* Provides an interface that exposes the HTML editor and text areas inside the provided editor div */
+    function extractDivElements(editorDivElement) {
+        var divElements = editorDivElement.getElementsByTagName("div");
+        return {
+            htmlDivElement: divElements[1],
+            textAreaDivElement: divElements[0]
+        };
+    }
 
     /* Provides an interface that gives the document object to be edited in the iframe */
     function getIFrameDocument(iframeElement) {
@@ -46,148 +462,6 @@
         }
     }
 
-    /* Provides an interface that exposes the HTML editor and text areas inside the provided editor div */
-    function extractDivElements(editorDivElement) {
-        var divElements = editorDivElement.getElementsByTagName("div");
-        return {
-            htmlDivElement: divElements[1],
-            textAreaDivElement: divElements[0]
-        };
-    }
-
-    ///////// Functionality that adds editor capabilities to a textarea div
-
-    function createIFrame(iframePage, width, height) {
-        var iframe = document.createElement("iframe");
-        iframe.src = iframePage;
-        iframe.style.width = width + "em";
-        iframe.style.height = height + "em";
-        return iframe;
-    }
-
-    function createOptionElement(value, text) {
-        var option = document.createElement("option");
-        option.value = value;
-        option.text = text;
-        return option;
-    }
-
-    function createStyleSelectBox(iframe) {
-        var selectBox = document.createElement("select");
-        selectBox.add(createOptionElement("", "[Style]"));
-        selectBox.add(createOptionElement("<p>", "Paragraph"));
-        selectBox.add(createOptionElement("<h1>", "Heading 1"));
-        selectBox.add(createOptionElement("<h2>", "Heading 2"));
-        selectBox.add(createOptionElement("<h3>", "Heading 3"));
-        selectBox.add(createOptionElement("<h4>", "Heading 4"));
-        selectBox.add(createOptionElement("<h5>", "Heading 5"));
-        selectBox.add(createOptionElement("<h6>", "Heading 6"));
-        selectBox.add(createOptionElement("<blockquote>", "Blockquote"));
-        selectBox.add(createOptionElement("<pre>", "Preformatted"));
-        selectBox.onchange = function() {
-            doRichEditCommand(iframe, "formatBlock", this.options[this.selectedIndex].value);
-        };
-        return selectBox;
-    }
-
-    function createDelimiter() {
-        var noBreakSpace = String.fromCharCode(160);
-        return document.createTextNode(noBreakSpace + "|" + noBreakSpace);
-    }
-
-    function createEditorButton(innerHTML, onclick) {
-        var button = document.createElement("button");
-        button.innerHTML = innerHTML;
-        button.onclick = onclick;
-        return button;
-    }
-
-    function createEditorDiv(iconsPath, iframePage, width, height) {
-        var div = document.createElement("div");
-        div.style.display = "none";
-
-        // Create iframe
-        var iframe = createIFrame(iframePage, width, height);
-
-        // Create select style section
-        div.appendChild(createStyleSelectBox(iframe));
-        div.appendChild(document.createElement("br"));
-
-        // Create highlight button
-        div.appendChild(createEditorButton("<strong>Highlight</strong>", function() {
-            return doRichEditCommand(iframe, "bold");
-        }));
-
-        // Create subscript button
-        div.appendChild(createEditorButton("S<sub>ubscript</sub>", function() {
-            return doRichEditCommand(iframe, "subscript");
-        }));
-
-        // Create superscript button
-        div.appendChild(createEditorButton("S<sup>uperscript</sup>", function() {
-            return doRichEditCommand(iframe, "superscript");
-        }));
-
-        // Create delimiter
-        div.appendChild(createDelimiter());
-
-        // Create link button
-        div.appendChild(createEditorButton('<img src="' + iconsPath + '/a.gif" alt="Add link">', function() {
-            return addLink(iframe);
-        }));
-
-        // Create unlink button
-        div.appendChild(createEditorButton('<img src="' + iconsPath + '/a-remove.gif" alt="Remove link">', function() {
-            return doRichEditCommand(iframe, "unlink");
-        }));
-
-        // Create add image button
-        div.appendChild(createEditorButton('<img src="' + iconsPath + '/img.gif" alt="Add image">', function() {
-            return addImage(iframe);
-        }));
-
-        // Create delimiter
-        div.appendChild(createDelimiter());
-
-        // Add unordered list button
-        div.appendChild(createEditorButton('<img src="' + iconsPath + '/ul.gif" alt="Add unordered list">', function() {
-            return doRichEditCommand(iframe, "InsertUnorderedList");
-        }));
-
-        // Add ordered list button
-        div.appendChild(createEditorButton('<img src="' + iconsPath + '/ol.gif" alt="Add ordered list">', function() {
-            return doRichEditCommand(iframe, "InsertOrderedList");
-        }));
-
-        // Create delimiter
-        div.appendChild(createDelimiter());
-
-        // Create table with horizontal header button
-        div.appendChild(createEditorButton('<img src="' + iconsPath + '/table_hh.gif" alt="Add table with horizontal header">', function() {
-            return addTableWithHorizontalHeader(iframe);
-        }));
-
-        // Create table with vertical header button
-        div.appendChild(createEditorButton('<img src="' + iconsPath + '/table_vh.gif" alt="Add table with vertical header">', function() {
-            return addTableWithVerticalHeader(iframe);
-        }));
-
-        // Create table without border button
-        div.appendChild(createEditorButton('<img src="' + iconsPath + '/table_vh.gif" alt="Add table without border">', function() {
-            return addTableWithoutBorder(iframe);
-        }));
-
-        // Create delimiter
-        div.appendChild(createDelimiter());
-        div.appendChild(document.createElement("br"));
-
-        // Add editable iframe
-        div.appendChild(iframe);
-
-        // Return the div
-        return div;
-    }
-
     function createViewSourceCheckBox(div) {
         var checkBox = document.createElement("input");
         checkBox.type = "checkbox";
@@ -203,25 +477,6 @@
         };
         return checkBox;
     }
-
-    /**
-     * Adds editor capabilities to a div element that embeds a text area.
-     *
-     * @param {String} id ID of the div to augment
-     * @param {String} iconsPath Path in which the editor icons reside
-     * @param {String} iframePage Path to an HTML page that is displayed inside the editor iframe
-     * @param {number} width Width of the editor (in em)
-     * @param {number} height Height of the editor (in em)
-     */
-    function addEditorCapabilities(id, iconsPath, iframePage, width, height) {
-        var div = document.getElementById(id);
-
-        div.appendChild(createEditorDiv(iconsPath, iframePage, width, height));
-        div.appendChild(createViewSourceCheckBox(div));
-        div.appendChild(document.createTextNode("View source"));
-    }
-
-    sbeditor.addEditorCapabilities = addEditorCapabilities;
 
     ////////// Functions that do the initialization on loading the page
 
@@ -295,207 +550,6 @@
     }
 
     sbeditor.initEditors = initEditors;
-
-    ////////// Functions that implement editor actions
-
-    function doRichEditCommand(iframeElement, command, arg) {
-        iframeElement.contentWindow.focus();
-        getIFrameDocument(iframeElement).execCommand(command, false, arg);
-        iframeElement.contentWindow.focus();
-        return false;
-    }
-
-    function addLink(iframe) {
-        var url = prompt("Enter link URL:", "http://");
-
-        if(url === null || url == "") {
-            alert("You must provide a URL!");
-        } else {
-            doRichEditCommand(iframe, "createLink", url);
-        }
-
-        return false;
-    }
-
-    function addImage(iframe) {
-        var url = prompt("Enter image URL:", "http://");
-
-        if(url === null || url == "") {
-            alert("You must provide an URL!");
-            return false;
-        }
-
-        var alt = prompt("Enter alternate text:", "image");
-
-        if(alt === null || alt == "") {
-            alert("You must provide alternate text!");
-            return false;
-        }
-
-        var html = '<img src="'+url+'" alt="'+alt+'">';
-        insertHTML(iframe, html);
-
-        return false;
-    }
-
-    /**
-     * Inserts HTML code into an iframe element's document
-     *
-     * @param {HTMLIFrameElement} iframeElement iframe element to insert code into
-     * @param {String} html HTML code to insert
-     */
-    function insertHTML(iframeElement, html) {
-        var iframeDocument = getIFrameDocument(iframeElement);
-
-        if(navigator.appName.indexOf("Microsoft") != -1) {
-            /* Insert routine for Internet Explorer */
-            iframeDocument.body.focus();
-            var range = iframeDocument.selection.createRange();
-            range.pasteHTML(html);
-            range.collapse(false);
-            range.select();
-        } else {
-            /* Insert routine for other browsers */
-            iframeDocument.execCommand("InsertHTML", false, html);
-        }
-
-        return false;
-    }
-
-    sbeditor.insertHTML = insertHTML;
-
-    function queryRows() {
-        var rows = prompt("Number of rows (excluding the header):", "1");
-        rows = parseInt(rows);
-
-        if(isNaN(rows) || rows <= 0) {
-            alert("You must specify at least one row!");
-            throw "You must specify at least one row!";
-        }
-
-        return rows;
-    }
-
-    function queryCols() {
-        var cols = prompt("Number of columns:", "1");
-        cols = parseInt(cols);
-
-        if(isNaN(cols) || cols <= 0) {
-            alert("You must specify at least one column!");
-            throw "You must specify at least one column!";
-        }
-
-        return cols;
-    }
-
-    function addTableWithHorizontalHeader(iframe) {
-        try {
-            var rows = queryRows();
-            var cols = queryCols();
-        } catch(e) {
-            return false;
-        }
-
-        var html = "<table>\n";
-
-        /* Add table header */
-
-        html += "<tr>\n";
-
-        for(var j = 0; j < cols; j++) {
-            html += "<th>&nbsp;</th>\n";
-        }
-
-        html += "</tr>\n";
-
-        /* Add each row to the document */
-
-        for(var i = 0; i < rows; i++) {
-            html += "<tr>\n";
-
-            /* Add each column to the document */
-
-            for(var j = 0; j < cols; j++) {
-                html += "<td>&nbsp;</td>\n";
-            }
-
-            html += "</tr>\n";
-        }
-
-        html += "</table>\n";
-
-        /* Add generated HTML to the document */
-        insertHTML(iframe, html);
-
-        return false;
-    }
-
-    function addTableWithVerticalHeader(iframe) {
-        try {
-            var rows = queryRows();
-            var cols = queryCols();
-        } catch(e) {
-            return false;
-        }
-
-        var html = "<table>\n";
-
-        /* Add each row to the document */
-
-        for(var i = 0; i < rows; i++) {
-            html += "<tr>\n";
-
-            /* Add column header */
-            html += "<th>&nbsp;</th>";
-
-            /* Add each column to the document */
-
-            for(var j = 0; j < cols; j++) {
-                html += "<td>&nbsp;</td>\n";
-            }
-
-            html += "</tr>\n";
-        }
-
-        html += "</table>\n";
-
-        /* Add generated HTML to the document */
-        insertHTML(iframe, html);
-
-        return false;
-    }
-
-    function addTableWithoutBorder(iframe) {
-        try {
-            var rows = queryRows();
-            var cols = queryCols();
-        } catch(e) {
-            return false;
-        }
-
-        var html = '<table class="noborder">\n';
-
-        /* Add each row to the document */
-
-        for(var i = 0; i < rows; i++) {
-            html += "<tr>\n";
-
-            /* Add each column to the document */
-
-            for(var j = 0; j < cols; j++) {
-                html += "<td>&nbsp;</td>\n";
-            }
-
-            html += "</tr>\n";
-        }
-
-        html += "</table>\n";
-
-        /* Add generated HTML to the document */
-        insertHTML(iframe, html);
-
-        return false;
-    }
 
     this.sbeditor = sbeditor;
 })();

@@ -37,13 +37,15 @@ function displayEditorTextAreaDiv(string $id, string $name, ?string $contents = 
  * @param $contents HTML code to edit (defaults to an empty string)
  * @param $width Width of the rich text editor in characters (defaults to 60)
  * @param $height Height of the rich text editor in characters (defaults to 20)
+ * @param $labelsParameter Expression referring to the labels parameter that can be used to provide a JavaScript object that defines the labels (null omits the parameter so that the default labels are used)
  */
-function displayHTMLEditor(string $id, string $name, string $iframePage, string $iconsPath, ?string $contents = "", int $width = 60, int $height = 20): void
+function displayHTMLEditor(string $id, string $name, string $iframePage, string $iconsPath, ?string $contents = "", int $width = 60, int $height = 20, string $labelsParameter = null): void
 {
 	displayEditorTextAreaDiv($id, $name, $contents, $width, $height);
 	?>
 	<script type="text/javascript">
-	sbeditor.addEditorCapabilities('<?= $id ?>', '<?= $iconsPath ?>', '<?= $iframePage ?>', '<?= $width ?>', '<?= $height ?>');
+	var editor_<?= $id ?> = new sbeditor.SBEditor('<?= $iconsPath ?>', '<?= $iframePage ?>', '<?= $width ?>', '<?= $height ?>'<?= $labelsParameter === null ? "" : (", ".$labelsParameter) ?>);
+	editor_<?= $id ?>.addEditorCapabilities('<?= $id ?>');
 	</script>
 	<?php
 }

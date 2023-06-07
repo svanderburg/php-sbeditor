@@ -113,10 +113,7 @@ $form = new Form(array(
 When displaying the above form as an editable form:
 
 ```php
-\SBData\View\HTML\displayEditableForm($form,
-    "Submit",
-    "One or more of the field values are incorrect!",
-    "This field is incorrect!");
+\SBData\View\HTML\displayEditableForm($form);
 ```
 
 Then the corresponding field will be displayed as an HTML editor (or a text area
@@ -131,6 +128,8 @@ This package includes two example web applications that can be found in the
 
 * The `simple` example demonstrates how to directly embed an editor div and how
   it can be used to retrieve the submitted data.
+* The `translated` example extends the previous example to show how it can be
+  translated into another language, such as Dutch.
 * The `form` example demonstrates how the editor can be integrated with the
   `php-sbdata` framework, so that input can be automatically validated and
   presented.

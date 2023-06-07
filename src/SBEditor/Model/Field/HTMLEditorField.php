@@ -23,6 +23,9 @@ class HTMLEditorField extends VisibleField
 	/** Height of the rich text editor in characters (defaults to 20) */
 	public int $height;
 
+	/** Expression referring to the labels parameter that can be used to provide a JavaScript object that defines the labels (null omits the parameter so that the default labels are used) */
+	public ?string $labelsParameter;
+
 	/** Package name */
 	public string $package;
 
@@ -36,8 +39,9 @@ class HTMLEditorField extends VisibleField
 	 * @param $mandatory Indicates whether a given value is mandatory
 	 * @param $width Width of the rich text editor in characters (defaults to 60)
 	 * @param $height Height of the rich text editor in characters (defaults to 20)
+	 * @param $labelsParameter Expression referring to the labels parameter that can be used to provide a JavaScript object that defines the labels (null omits the parameter so that the default labels are used)
 	 */
-	public function __construct(string $id, string $title, string $iframePage, string $iconsPath, bool $mandatory = false, int $width = 60, int $height = 20)
+	public function __construct(string $id, string $title, string $iframePage, string $iconsPath, bool $mandatory = false, int $width = 60, int $height = 20, string $labelsParameter = null)
 	{
 		parent::__construct($title, new Value($mandatory));
 		$this->id = $id;
@@ -45,6 +49,7 @@ class HTMLEditorField extends VisibleField
 		$this->iconsPath = $iconsPath;
 		$this->width = $width;
 		$this->height = $height;
+		$this->labelsParameter = $labelsParameter;
 		$this->package = "SBEditor";
 	}
 }

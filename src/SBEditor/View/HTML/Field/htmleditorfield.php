@@ -15,7 +15,7 @@ function displayHTMLEditorField(HTMLEditorField $field): void
 
 function displayEditableHTMLEditorField(string $name, HTMLEditorField $field): void
 {
-	\SBEditor\View\HTML\displayHTMLEditor($field->id, $name, $field->iframePage, $field->iconsPath, $field->exportValue(), $field->width, $field->height);
+	\SBEditor\View\HTML\displayHTMLEditor($field->id, $name, $field->iframePage, $field->iconsPath, $field->exportValue(), $field->width, $field->height, $field->labelsParameter);
 }
 
 /**
