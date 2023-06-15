@@ -44,7 +44,7 @@ function displayHTMLEditor(string $id, string $name, string $iframePage, string 
 	displayEditorTextAreaDiv($id, $name, $contents, $width, $height);
 	?>
 	<script type="text/javascript">
-	var editor_<?= $id ?> = new sbeditor.SBEditor('<?= $iconsPath ?>', '<?= $iframePage ?>', '<?= $width ?>', '<?= $height ?>'<?= $labelsParameter === null ? "" : (", ".$labelsParameter) ?>);
+	var editor_<?= $id ?> = new sbeditor.SBEditor('<?= $iconsPath ?>', '<?= $iframePage ?>', <?= $width ?>, <?= $height ?><?= $labelsParameter === null ? "" : (", ".$labelsParameter) ?>);
 	editor_<?= $id ?>.addEditorCapabilities('<?= $id ?>');
 	</script>
 	<?php
