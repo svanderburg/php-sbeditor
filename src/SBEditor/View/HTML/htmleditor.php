@@ -21,7 +21,7 @@ function displayEditorTextAreaDiv(string $id, string $name, ?string $contents = 
 	?>
 	<div class="sbeditor" id="<?= $id ?>">
 		<div>
-			<textarea name="<?= $name ?>" cols="<?= $width ?>" rows="<?= $height ?>"><?= htmlentities($contents) ?></textarea>
+			<textarea name="<?= $name ?>" cols="<?= $width ?>" rows="<?= $height ?>"><?= $contents === null ? "" : htmlentities($contents) ?></textarea>
 		</div>
 	</div>
 	<?php

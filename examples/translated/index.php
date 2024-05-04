@@ -21,7 +21,7 @@ require_once("../../vendor/autoload.php");
 			{
 				$contents = $_REQUEST["contents"];
 				?>
-				<p>You have submitted:</p>
+				<p>Je hebt verzonden:</p>
 				<div><?= $_REQUEST["contents"] ?></div>
 				<?php
 			}
