@@ -13,7 +13,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/svanderburg/php-sbdata.git",
-                "reference": "cb3dd1c0de175b36ddafd3c9d64c8e90b35134de"
+                "reference": "434133b7b1341885bd064ba84ee48732abeb9b3d"
             },
             "require-dev": {
                 "abeautifulsite/simple-php-captcha": "1.0.x",
@@ -27,12 +27,13 @@
                 },
                 "files": [
                     "src/SBData/View/HTML/table.php",
-                    "src/SBData/View/HTML/pager.php",
-                    "src/SBData/View/HTML/pageddbtable.php",
+                    "src/SBData/View/HTML/editabletable.php",
                     "src/SBData/View/HTML/form.php",
                     "src/SBData/View/HTML/util.php",
                     "src/SBData/View/HTML/field.php",
+                    "src/SBData/View/HTML/label.php",
                     "src/SBData/View/HTML/Field/acceptablefilenamefield.php",
+                    "src/SBData/View/HTML/Field/agreefield.php",
                     "src/SBData/View/HTML/Field/arraycomboboxfield.php",
                     "src/SBData/View/HTML/Field/textareafield.php",
                     "src/SBData/View/HTML/Field/checkboxfield.php",
@@ -68,8 +69,7 @@
             "autoload-dev": {
                 "psr-4": {
                     "Examples\\Books\\": "examples/books/includes",
-                    "Examples\\CAPTCHA\\": "examples/captcha/includes",
-                    "Examples\\TodoList\\": "examples/todolist/includes"
+                    "Examples\\CAPTCHA\\": "examples/captcha/includes"
                 },
                 "files": [
                     "examples/captcha/includes/View/HTML/Field/captchafield.php"
@@ -86,7 +86,7 @@
                 }
             ],
             "description": "Abstractions to deal with checking and displaying fields, forms and tables in web applications",
-            "time": "2023-03-18T15:55:04+00:00"
+            "time": "2024-05-04T19:33:59+00:00"
         }
     ],
     "aliases": [],
@@ -98,5 +98,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
