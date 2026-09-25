@@ -39,7 +39,7 @@ function displayEditorTextAreaDiv(string $id, string $name, ?string $contents = 
  * @param $height Height of the rich text editor in characters (defaults to 20)
  * @param $labelsParameter Expression referring to the labels parameter that can be used to provide a JavaScript object that defines the labels (null omits the parameter so that the default labels are used)
  */
-function displayHTMLEditor(string $id, string $name, string $iframePage, string $iconsPath, ?string $contents = "", int $width = 60, int $height = 20, string $labelsParameter = null): void
+function displayHTMLEditor(string $id, string $name, string $iframePage, string $iconsPath, ?string $contents = "", int $width = 60, int $height = 20, ?string $labelsParameter = null): void
 {
 	displayEditorTextAreaDiv($id, $name, $contents, $width, $height);
 	?>

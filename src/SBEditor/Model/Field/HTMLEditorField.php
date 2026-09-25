@@ -41,7 +41,7 @@ class HTMLEditorField extends VisibleField
 	 * @param $height Height of the rich text editor in characters (defaults to 20)
 	 * @param $labelsParameter Expression referring to the labels parameter that can be used to provide a JavaScript object that defines the labels (null omits the parameter so that the default labels are used)
 	 */
-	public function __construct(string $id, string $title, string $iframePage, string $iconsPath, bool $mandatory = false, int $width = 60, int $height = 20, string $labelsParameter = null)
+	public function __construct(string $id, string $title, string $iframePage, string $iconsPath, bool $mandatory = false, int $width = 60, int $height = 20, ?string $labelsParameter = null)
 	{
 		parent::__construct($title, new Value($mandatory));
 		$this->id = $id;
